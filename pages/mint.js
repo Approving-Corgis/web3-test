@@ -14,7 +14,7 @@ const readableChain = (chain) => {
   }
 }
 
-const Home = () => { 
+const Mint = () => { 
   const chain = '0x4';
 
   const [hasMetamask, setHasMetamask] = useState(false);
@@ -24,20 +24,9 @@ const Home = () => {
 
 
   const isMetaMaskInstalled = () => {
-    return Boolean(window.ethereum)
+    const { isMetaMask } = ethereum
+    return Boolean(isMetaMask)
   }
-
-  // useEffect(()  => {
-  //   if(isMetaMaskInstalled()){ 
-  //     const con = window.ethereum.isConnected
-  //     console.log("🚀 ~ file: index.js ~ line 33 ~ useEffect ~ window.ethereum.isConnected", con)
-  //     if(window.ethereum.isConnected) {
-  //       setConnected(true);
-  //     } else {
-  //       setConnected(false);
-  //     }
-  //   }
-  // },[]);
 
   useEffect(() => {
     if(isMetaMaskInstalled()){
@@ -47,28 +36,32 @@ const Home = () => {
     }
   }, [hasMetamask]);
 
+  useEffect(() => {
+    if(ethereum.isConnected) {
+      getAccounts();
+      setConnected(true);
+    } else {
+      setConnected(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if(isMetaMaskInstalled()) {
-      getChainId();
-    }
+    getChainId();
   })
 
   useEffect(() => {
-    if(isMetaMaskInstalled()) {
-      window.ethereum.on('chainChanged', () => {
-        getChainId();
-      })
-    }
+    ethereum.on('chainChanged', () => {
+      getChainId();
+    })
   })
 
   const getAccounts = async() => {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
       setAddresses(accounts);
   }
 
   const getChainId = async () => {
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    const chainId = await ethereum.request({ method: 'eth_chainId' });
     if(chainId !== chain) {
       setIsCorrectChain(false);
     } else {
@@ -80,7 +73,8 @@ const Home = () => {
   const connectMetaMask = async () => {
     try {
       // ask user permission to access his accounts
-      getAccounts();
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      setAddresses(accounts);
       setConnected(true);
     } catch (error) {
       setConnected(false);
@@ -108,4 +102,4 @@ const Home = () => {
   )
 }
 
-export default Home;
+export default Mint;
