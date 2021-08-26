@@ -44,18 +44,12 @@ export const getCurrentWalletConnected = async () => {
   if (window.ethereum) {
     try {
       const addressArray = await window.ethereum.request({
-        method: "eth_accounts",
+        method: "eth_requestAccounts",
       });
       if (addressArray.length > 0) {
-        return {
-          address: addressArray[0],
-          status: "👆🏽 Write a message in the text-field above.",
-        };
+        return {address: addressArray[0]}
       } else {
-        return {
-          address: "",
-          status: "🦊 Connect to Metamask using the top right button.",
-        };
+        return null;
       }
     } catch (err) {
       return {
@@ -81,10 +75,6 @@ export const getCurrentWalletConnected = async () => {
     };
   }
 };
-
-async function loadContract() {
-  return new web3.eth.Contract(approvingABI, contractAddress);
-}
 
 export const mintNFT = async (url, name, description) => {
   if (url.trim() == "" || name.trim() == "" || description.trim() == "") {
@@ -128,3 +118,16 @@ export const mintNFT = async (url, name, description) => {
     };
   }
 };
+
+export const earlyAccess = async () => {
+  window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+
+  window.contract.methods
+    .earlyAccessAddresses(window.ethereum.selectedAddress)
+    .call(function (err, res) {
+      if(err) {
+        console.log("🚀 ~ file: interact.js ~ line 143 ~ err", err)
+      }
+      console.log("🚀 ~ file: interact.js ~ line 142 ~ res", res)
+    })
+}

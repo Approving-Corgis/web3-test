@@ -1,46 +1,34 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
+import { 
+  balanceOf, 
+  hasEarlyAccess, 
+  mintOneBone, 
+  checkMaxBones,
+  checkCurrentBonesMinted } from '../utils/approving-bone';
+import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 
-var web3 = new Web3(Web3.givenProvider);
-
-const readableChain = (chain) => {
-  switch (chain) {
-    case '0x4':
-      return 'Rinkeby';
-    case '0x1':
-      return 'Ethereum Main Network';
-    default:
-      break;
-  }
-}
 
 const Home = () => { 
   const chain = '0x4';
 
   const [hasMetamask, setHasMetamask] = useState(false);
   const [connected, setConnected] = useState(false);
-  const [addresses, setAddresses] = useState([]);
+  const [addresses, setAddresses] = useState('');
   const [isCorrectChain, setIsCorrectChain] = useState(false);
+  const [isAllowedToMint, setIsAllowedToMint] = useState(false);
+  const [alreadyOwnedBone, setAlreadyOwnedBone] = useState(false);
+  const [maxBones, setMaxBones] = useState(0);
+  const [currentBones, setCurrentBones] = useState(0);
 
 
   const isMetaMaskInstalled = () => {
     return Boolean(window.ethereum)
   }
 
-  // useEffect(()  => {
-  //   if(isMetaMaskInstalled()){ 
-  //     const con = window.ethereum.isConnected
-  //     console.log("🚀 ~ file: index.js ~ line 33 ~ useEffect ~ window.ethereum.isConnected", con)
-  //     if(window.ethereum.isConnected) {
-  //       setConnected(true);
-  //     } else {
-  //       setConnected(false);
-  //     }
-  //   }
-  // },[]);
-
   useEffect(() => {
     if(isMetaMaskInstalled()){
+      getAccounts();
       setHasMetamask(true);
     } else {
       setHasMetamask(false);
@@ -63,47 +51,94 @@ const Home = () => {
   })
 
   const getAccounts = async() => {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      setAddresses(accounts);
+    const connection = await getCurrentWalletConnected();
+    if(connection.status === 'Connected') {
+      setAddresses(connection.address);
+      setConnected(true);
+      // check if user has early access rights
+      checkHasAccessToMintBone();
+      checkAvailability();
+    }
   }
 
   const getChainId = async () => {
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    if(chainId !== chain) {
-      setIsCorrectChain(false);
-    } else {
-      setIsCorrectChain(true);
-    }
+    const chain = await checkChain();
+    setIsCorrectChain(chain);
   }
 
 
   const connectMetaMask = async () => {
+    getAccounts()
+  }
+
+  const checkHasAccessToMintBone = async () => {
     try {
-      // ask user permission to access his accounts
-      getAccounts();
-      setConnected(true);
+      const balance = await balanceOf();
+      if(balance < 1) {
+        setAlreadyOwnedBone(false);
+        const hasAccess = await hasEarlyAccess();
+        setIsAllowedToMint(hasAccess);
+      } else {
+        setAlreadyOwnedBone(true);
+      }
     } catch (error) {
-      setConnected(false);
+      
     }
+  }
+
+  const mintBoneNow = async () => {
+    const mint = await mintOneBone();
+    console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
+  }
+
+  const checkAvailability = async() => {
+    const bones = await checkMaxBones();
+    const availableBones = await checkCurrentBonesMinted();
+    setMaxBones(bones);
+    setCurrentBones(availableBones);
   }
 
   return (
     <div>
-      {hasMetamask ? 
-        (
-          !connected ? 
-            <button onClick={() => connectMetaMask()}>Connect Metamask</button>
-          :
-            (
-              isCorrectChain ?
-                <p>{addresses}</p>
+      <div>
+        {hasMetamask ? 
+          (
+            !connected ? 
+              <button onClick={() => connectMetaMask()}>Connect Metamask</button>
+            :
+              (
+                isCorrectChain ?
+                  <p>{addresses}</p>
+                  :
+                  <h2>Wrong Chain. Chain must be Rinkeby</h2>
+              )
+            )
+            :
+          <h2>You must install metamask</h2>
+        }
+      </div>
+      <div>
+        {connected && 
+          ( 
+            alreadyOwnedBone ? 
+              <div>
+                You already own one
+                <p>Current: {currentBones} / {maxBones}</p>
+              </div>
+            :
+            (  
+              isAllowedToMint ? 
+                <div>
+                  <p>You are allowed to Mint</p>
+                  <button onClick={() => mintBoneNow()}>Mint Bone</button>
+                  <p>Current: {currentBones} / {maxBones}</p>
+                </div>
                 :
-                <h2>Wrong Chain. Chain must be {readableChain(chain)}</h2>
+                <div>You are not allowed to Mint</div>
             )
           )
-          :
-        <h2>You must install metamask</h2>
-      }
+        }
+      </div>
     </div>
   )
 }
