@@ -1,7 +1,7 @@
 import approvingABI from "./approving-bone-abi.json";
-const contractAddress = "0x0a5A7Cc06e85bb9F05d2f7a875B2b0168E3121e8";
 import Web3 from 'web3';
 
+const contractAddress = "0x0a5A7Cc06e85bb9F05d2f7a875B2b0168E3121e8";
 const web3 = new Web3(Web3.givenProvider);
 
 /*
@@ -39,6 +39,7 @@ const balanceOf = async () => {
 
 /*
   * This function checks maximum number of Bones available
+  * Should be 400
 */
 const checkMaxBones = async () => {
   if (window.ethereum) { 
@@ -54,7 +55,22 @@ const checkMaxBones = async () => {
 }
 
 /*
-  * This function checks maximum number of Bones available
+  * This function checks if bone minting is currently active
+*/
+const checkIfBoneMintIsActive = async () => {
+  if (window.ethereum) { 
+    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    try {
+      const isActive = await  window.contract.methods.boneMintActive().call()
+      return isActive;
+    } catch (error) {
+      console.log('eearly access error:: ', error)
+    }
+  }
+}
+
+/*
+  * This function checks current number of minted Bones
 */
 const checkCurrentBonesMinted = async () => {
   if (window.ethereum) { 
@@ -90,5 +106,6 @@ export {
   balanceOf,
   mintOneBone,
   checkMaxBones,
-  checkCurrentBonesMinted
+  checkCurrentBonesMinted,
+  checkIfBoneMintIsActive
 }
