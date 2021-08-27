@@ -157,15 +157,17 @@ const mintEarlyAccess = async ({amount, numberOfTokens}) => {
   if (window.ethereum) { 
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
-      const mint = await  window.contract.methods.earlyAccessMint({numberOfTokens})
+      const convertedAmount = web3.utils.toWei(amount.toString());
+
+      const mint = await  window.contract.methods.earlyAccessMint(numberOfTokens)
         .send({
           from: window.ethereum.selectedAddress,
-          value: amount // This should be the computed amount: 5 x 0.05 = 0.25
+          value: convertedAmount // This should be the computed amount: 5 x 0.05 = 0.25
         });
-      console.log("🚀 ~ file: approving-bone.js ~ line 31 ~ mintBone ~ mint", mint)
+      console.log("🚀 ~ file: approving-bone.js ~ line 31 ~ mintEarlyAccess ~ mint", mint)
       return mint;
     } catch (error) {
-      console.log("🚀 ~ file: approving-bone.js ~ line 34 ~ mintBone ~ error", error)
+      console.log("🚀 ~ file: approving-bone.js ~ line 34 ~ mintEarlyAccess ~ error", error)
     }
   }
 }
@@ -179,10 +181,11 @@ const mintCorgis = async ({amount, numberOfTokens}) => {
   if (window.ethereum) { 
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
-      const mint = await  window.contract.methods.earlyAccessMint({numberOfTokens})
+      const convertedAmount = web3.utils.toWei(amount.toString());
+      const mint = await  window.contract.methods.earlyAccessMint(numberOfTokens)
         .send({
           from: window.ethereum.selectedAddress,
-          value: amount // This should be the computed amount: 5 x 0.05 = 0.25
+          value: convertedAmount // This should be the computed amount: 5 x 0.05 = 0.25
         });
       console.log("🚀 ~ file: approving-bone.js ~ line 31 ~ mintBone ~ mint", mint)
       return mint;

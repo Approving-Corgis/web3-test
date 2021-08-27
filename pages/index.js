@@ -5,6 +5,7 @@ import {
   mintOneBone, 
   checkMaxBones,
   checkCurrentBonesMinted } from '../utils/approving-bone';
+import { mintEarlyAccess } from '../utils/approving-corgis-early-access';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 
 
@@ -19,7 +20,11 @@ const Home = () => {
   const [alreadyOwnedBone, setAlreadyOwnedBone] = useState(false);
   const [maxBones, setMaxBones] = useState(0);
   const [currentBones, setCurrentBones] = useState(0);
+  const [mintQt, setMintQt] = useState(0);
 
+  const handleChange = (event) => {
+    setMintQt(event.target.value)
+  }
 
   const isMetaMaskInstalled = () => {
     return Boolean(window.ethereum)
@@ -90,6 +95,15 @@ const Home = () => {
     console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
 
+  const mintCorgis = async () => {
+    const payload = {
+      amount: (mintQt  * 0.05),
+      numberOfTokens: mintQt,
+    }
+    const mint = await mintEarlyAccess(payload);
+    console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
+  }
+
   const checkAvailability = async() => {
     const bones = await checkMaxBones();
     const availableBones = await checkCurrentBonesMinted();
@@ -137,6 +151,15 @@ const Home = () => {
             )
           )
         }
+      </div>
+        { alreadyOwnedBone && (
+          <div>
+            Quantity <input type="number" value={mintQt}  onChange={handleChange} />
+            <button onClick={() => mintCorgis()}>Mint Early Access</button>
+          </div>
+        )}
+      <div>
+
       </div>
     </div>
   )

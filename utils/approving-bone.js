@@ -30,6 +30,7 @@ const balanceOf = async () => {
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
       const balance = await  window.contract.methods.balanceOf(window.ethereum.selectedAddress).call()
+      console.log("🚀 ~ file: approving-bone.js ~ line 33 ~ balanceOf ~ balance", balance)
       return balance;
     } catch (error) {
       console.log('eearly access error:: ', error)
