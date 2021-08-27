@@ -1,3 +1,8 @@
+import constants from "./constants";
+
+/*
+  * This function checks if metamask is installed, is metamask connected
+*/
 export const getCurrentWalletConnected = async () => {
   if (window.ethereum) {
     try {
@@ -7,7 +12,7 @@ export const getCurrentWalletConnected = async () => {
       if (addressArray.length > 0) {
         return {address: addressArray[0], status: 'Connected'}
       } else {
-        return {address: null, status: 'Not Conncted'};
+        return {address: null, status: 'Not Connected'};
       }
     } catch (err) {
       return {
@@ -23,9 +28,12 @@ export const getCurrentWalletConnected = async () => {
   }
 };
 
+/*
+  * This function checks if user is connected to the correct chain
+*/
 export const checkChain = async () => {
   const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-  if(chainId === '0x4') {
+  if(chainId === constants.DEFAULT_CHAIN) { // Rinkeby testnet, Ethereum for mainnet
     return true;
   } else {
     return false;
