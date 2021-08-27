@@ -5,7 +5,7 @@ import {
   mintOneBone, 
   checkMaxBones,
   checkCurrentBonesMinted } from '../utils/approving-bone';
-import { mintEarlyAccess } from '../utils/approving-corgis-early-access';
+import { mintCorgis, mintEarlyAccess } from '../utils/approving-corgis-early-access';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 
 
@@ -21,9 +21,13 @@ const Home = () => {
   const [maxBones, setMaxBones] = useState(0);
   const [currentBones, setCurrentBones] = useState(0);
   const [mintQt, setMintQt] = useState(0);
+  const [pubMintQt, setPubMintQt] = useState(0);
 
   const handleChange = (event) => {
     setMintQt(event.target.value)
+  }
+  const handleChangePub = (event) => {
+    setPubMintQt(event.target.value)
   }
 
   const isMetaMaskInstalled = () => {
@@ -95,12 +99,21 @@ const Home = () => {
     console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
 
-  const mintCorgis = async () => {
+  const mintCorgisEarly = async () => {
     const payload = {
-      amount: (mintQt  * 0.05),
+      amount: (mintQt  * 0.05), // number of corgis * price
       numberOfTokens: mintQt,
     }
     const mint = await mintEarlyAccess(payload);
+    console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
+  }
+
+  const mintCorgisPub = async () => {
+    const payload = {
+      amount: (pubMintQt  * 0.05), // number of corgis * price
+      numberOfTokens: mintQt,
+    }
+    const mint = await mintCorgis(payload);
     console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
 
@@ -154,8 +167,18 @@ const Home = () => {
       </div>
         { alreadyOwnedBone && (
           <div>
+            <h2>Early Access Mint</h2>
             Quantity <input type="number" value={mintQt}  onChange={handleChange} />
-            <button onClick={() => mintCorgis()}>Mint Early Access</button>
+            <button onClick={() => mintCorgisEarly()}>Mint Early Access</button>
+          </div>
+        )}
+      <div>
+      </div>
+        { alreadyOwnedBone && (
+          <div>
+            <h2>Public Mint</h2>
+            Quantity <input type="number" value={pubMintQt}  onChange={handleChangePub} />
+            <button onClick={() => mintCorgisPub()}>Mint Corgis</button>
           </div>
         )}
       <div>

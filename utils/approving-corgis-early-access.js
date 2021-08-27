@@ -182,7 +182,7 @@ const mintCorgis = async ({amount, numberOfTokens}) => {
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
       const convertedAmount = web3.utils.toWei(amount.toString());
-      const mint = await  window.contract.methods.earlyAccessMint(numberOfTokens)
+      const mint = await  window.contract.methods.mintCorgis(numberOfTokens)
         .send({
           from: window.ethereum.selectedAddress,
           value: convertedAmount // This should be the computed amount: 5 x 0.05 = 0.25
