@@ -1,7 +1,7 @@
 import approvingABI from "./approving-corgis-abi.json";
 import Web3 from 'web3';
 
-const contractAddress = "0xC5720fcfA7f02BD66BF495f5CD9B1Ebe5F2574aF";
+const contractAddress = "0xE165BFe7179f315DD88Be5e87556D0c756cE2eb7";
 const web3 = new Web3(Web3.givenProvider);
 
 
