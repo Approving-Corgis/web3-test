@@ -1,28 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { 
-  balanceOf, 
-  hasEarlyAccess, 
-  mintOneBone, 
-  checkMaxBones,
-  checkCurrentBonesMinted } from '../utils/approving-bone';
+import { balanceOf } from '../utils/approving-bone';
+import { checkCurrentCorgisMinted, checkMaxEarlyAccess, mintEarlyAccess, checkIfEarlyAccessIsActive } from '../utils/approving-corgis-early-access';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 
 
 const Home = () => { 
+  const chain = '0x4';
+
   const [hasMetamask, setHasMetamask] = useState(false);
   const [connected, setConnected] = useState(false);
   const [addresses, setAddresses] = useState('');
   const [isCorrectChain, setIsCorrectChain] = useState(false);
+  const [maxEarly, setMaxEarly] = useState(0);
+  const [mintQt, setMintQt] = useState(0);
   const [isAllowedToMint, setIsAllowedToMint] = useState(false);
-  const [alreadyOwnedBone, setAlreadyOwnedBone] = useState(false);
-  const [maxBones, setMaxBones] = useState(0);
-  const [currentBones, setCurrentBones] = useState(0);
+  const [currentEarly, setCurrentEarly] = useState(0);
+  const [isEarlyMintActive, setIsEarlyMintActive] = useState(false);
 
   const handleChange = (event) => {
     setMintQt(event.target.value)
-  }
-  const handleChangePub = (event) => {
-    setPubMintQt(event.target.value)
   }
 
   const isMetaMaskInstalled = () => {
@@ -59,9 +55,15 @@ const Home = () => {
       setAddresses(connection.address);
       setConnected(true);
       // check if user has early access rights
-      checkHasAccessToMintBone();
+      checkHasEarlyAccess();
       checkAvailability();
+      checkEarlyAccessIsActive();
     }
+  }
+
+  const checkEarlyAccessIsActive = async () => {
+    const isActive = await checkIfEarlyAccessIsActive();
+    setIsEarlyMintActive(isActive);
   }
 
   const getChainId = async () => {
@@ -74,31 +76,33 @@ const Home = () => {
     getAccounts()
   }
 
-  const checkHasAccessToMintBone = async () => {
+  const checkHasEarlyAccess = async () => {
     try {
       const balance = await balanceOf();
       if(balance < 1) {
-        setAlreadyOwnedBone(false);
-        const hasAccess = await hasEarlyAccess();
-        setIsAllowedToMint(hasAccess);
+        setIsAllowedToMint(false);
       } else {
-        setAlreadyOwnedBone(true);
+        setIsAllowedToMint(true);
       }
     } catch (error) {
       
     }
   }
 
-  const mintBoneNow = async () => {
-    const mint = await mintOneBone();
+  const mintCorgisEarly = async () => {
+    const payload = {
+      amount: (mintQt  * 0.05), // number of corgis * price
+      numberOfTokens: mintQt,
+    }
+    const mint = await mintEarlyAccess(payload);
     console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
 
   const checkAvailability = async() => {
-    const bones = await checkMaxBones();
-    const availableBones = await checkCurrentBonesMinted();
-    setMaxBones(bones);
-    setCurrentBones(availableBones);
+    const maxCorgis = await checkMaxEarlyAccess();
+    const hasMinetd = await checkCurrentCorgisMinted();
+    setMaxEarly(maxCorgis);
+    setCurrentEarly(hasMinetd);
   }
 
   return (
@@ -121,25 +125,20 @@ const Home = () => {
         }
       </div>
       <div>
-        {connected && 
-          ( 
-            alreadyOwnedBone ? 
-              <div>
-                You already own one
-                <p>Current: {currentBones} / {maxBones}</p>
-              </div>
-            :
-            (  
-              isAllowedToMint ? 
-                <div>
-                  <p>You are allowed to Mint</p>
-                  <button onClick={() => mintBoneNow()}>Mint Bone</button>
-                  <p>Current: {currentBones} / {maxBones}</p>
-                </div>
-                :
-                <div>You are not allowed to Mint</div>
-            )
-          )
+        { isEarlyMintActive ? (
+          isAllowedToMint ? 
+          <div>
+            <h2>Early Access Mint</h2>
+            Quantity <input type="number" value={mintQt}  onChange={handleChange} />
+            <button onClick={() => mintCorgisEarly()}>Mint Early Access</button>
+            <p>Count: {currentEarly}/{maxEarly}</p>
+          </div>
+          : 
+          <h3>You are not eligible for early access</h3>
+        ) : 
+          <div>
+            <h2>Early Access Mint Not Yet Active </h2>
+          </div>
         }
       </div>
     </div>

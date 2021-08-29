@@ -1,7 +1,7 @@
 import approvingABI from "./approving-corgis-abi.json";
 import Web3 from 'web3';
 
-const contractAddress = "0xE165BFe7179f315DD88Be5e87556D0c756cE2eb7";
+const contractAddress = "0x0f12ef8195E058C37FAE62E5c2E6429dE2C17Ad4";
 const web3 = new Web3(Web3.givenProvider);
 
 
@@ -27,7 +27,7 @@ const checkIfMintIsActive = async () => {
   if (window.ethereum) { 
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
-      const isActive = await  window.contract.methods.saleIsActive().call()
+      const isActive = await  window.contract.methods.corgiSaleIsActive().call()
       return isActive;
     } catch (error) {
       console.log('eearly access error:: ', error)

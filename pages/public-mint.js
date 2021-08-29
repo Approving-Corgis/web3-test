@@ -5,6 +5,7 @@ import {
   mintOneBone, 
   checkMaxBones,
   checkCurrentBonesMinted } from '../utils/approving-bone';
+import { checkCurrentCorgisMinted, checkIfMintIsActive, checkMaxCorgisAvailable, mintCorgis, mintEarlyAccess } from '../utils/approving-corgis-early-access';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 
 
@@ -13,14 +14,11 @@ const Home = () => {
   const [connected, setConnected] = useState(false);
   const [addresses, setAddresses] = useState('');
   const [isCorrectChain, setIsCorrectChain] = useState(false);
-  const [isAllowedToMint, setIsAllowedToMint] = useState(false);
-  const [alreadyOwnedBone, setAlreadyOwnedBone] = useState(false);
-  const [maxBones, setMaxBones] = useState(0);
-  const [currentBones, setCurrentBones] = useState(0);
+  const [maxCorgis, setMaxCorgis] = useState(0);
+  const [currentCorgis, setCurrentCorgis] = useState(0);
+  const [pubMintQt, setPubMintQt] = useState(0);
+  const [isSaleActive, setIsSaleActive] = useState(false);
 
-  const handleChange = (event) => {
-    setMintQt(event.target.value)
-  }
   const handleChangePub = (event) => {
     setPubMintQt(event.target.value)
   }
@@ -61,7 +59,13 @@ const Home = () => {
       // check if user has early access rights
       checkHasAccessToMintBone();
       checkAvailability();
+      checkSaleIsActive();
     }
+  }
+
+  const checkSaleIsActive = async () => {
+    const isActive = await checkIfMintIsActive();
+    setIsSaleActive(isActive);
   }
 
   const getChainId = async () => {
@@ -89,16 +93,20 @@ const Home = () => {
     }
   }
 
-  const mintBoneNow = async () => {
-    const mint = await mintOneBone();
+  const mintCorgisPub = async () => {
+    const payload = {
+      amount: (pubMintQt  * 0.05), // number of corgis * price
+      numberOfTokens: mintQt,
+    }
+    const mint = await mintCorgis(payload);
     console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
 
   const checkAvailability = async() => {
-    const bones = await checkMaxBones();
-    const availableBones = await checkCurrentBonesMinted();
-    setMaxBones(bones);
-    setCurrentBones(availableBones);
+    const maxCorgis = await checkMaxCorgisAvailable();
+    const mintedCorgis = await checkCurrentCorgisMinted();
+    setMaxCorgis(maxCorgis);
+    setCurrentCorgis(mintedCorgis);
   }
 
   return (
@@ -110,36 +118,24 @@ const Home = () => {
               <button onClick={() => connectMetaMask()}>Connect Metamask</button>
             :
               (
-                isCorrectChain ?
-                  <p>{addresses}</p>
+                isCorrectChain ? (
+                  isSaleActive ? 
+                  <div>
+                    <p>{addresses}</p>
+                    <h2>Public Mint</h2>
+                    Quantity <input type="number" value={pubMintQt}  onChange={handleChangePub} />
+                    <button onClick={() => mintCorgisPub()}>Mint Corgis</button>
+                    <p>Current: {currentCorgis} / {maxCorgis}</p>
+                  </div>
+                  : 
+                  <h2>Public Sale is not yet active</h2>
+                )
                   :
                   <h2>Wrong Chain. Chain must be Rinkeby</h2>
               )
             )
             :
           <h2>You must install metamask</h2>
-        }
-      </div>
-      <div>
-        {connected && 
-          ( 
-            alreadyOwnedBone ? 
-              <div>
-                You already own one
-                <p>Current: {currentBones} / {maxBones}</p>
-              </div>
-            :
-            (  
-              isAllowedToMint ? 
-                <div>
-                  <p>You are allowed to Mint</p>
-                  <button onClick={() => mintBoneNow()}>Mint Bone</button>
-                  <p>Current: {currentBones} / {maxBones}</p>
-                </div>
-                :
-                <div>You are not allowed to Mint</div>
-            )
-          )
         }
       </div>
     </div>

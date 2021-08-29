@@ -1,7 +1,7 @@
 import approvingABI from "./approving-bone-abi.json";
 import Web3 from 'web3';
 
-const contractAddress = "0x0a5A7Cc06e85bb9F05d2f7a875B2b0168E3121e8";
+const contractAddress = "0x0Af9F92A91E724Dd4E542FaCd2cc46cBd7F504d4";
 const web3 = new Web3(Web3.givenProvider);
 
 /*
