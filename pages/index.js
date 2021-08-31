@@ -4,7 +4,8 @@ import {
   hasEarlyAccess, 
   mintOneBone, 
   checkMaxBones,
-  checkCurrentBonesMinted } from '../utils/approving-bone';
+  checkCurrentBonesMinted, 
+  addAddresses} from '../utils/approving-bone';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 
 
@@ -94,6 +95,10 @@ const Home = () => {
     console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
 
+  const addMultiple = async () => {
+    const mint = await addAddresses();
+  }
+
   const checkAvailability = async() => {
     const bones = await checkMaxBones();
     const availableBones = await checkCurrentBonesMinted();
@@ -140,6 +145,14 @@ const Home = () => {
                 <div>You are not allowed to Mint</div>
             )
           )
+        }
+      </div>
+      <div>
+      {connected && 
+        <div>
+          <p>Add multiple addresses</p>
+          <button onClick={() => addMultiple()}>Add</button>
+        </div>
         }
       </div>
     </div>

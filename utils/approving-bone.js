@@ -1,5 +1,6 @@
 import approvingABI from "./approving-bone-abi.json";
 import Web3 from 'web3';
+import { addresses } from "./adresses";
 
 const contractAddress = "0x0Af9F92A91E724Dd4E542FaCd2cc46cBd7F504d4";
 const web3 = new Web3(Web3.givenProvider);
@@ -94,8 +95,30 @@ const mintOneBone = async () => {
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
       const mint = await  window.contract.methods.mintBone().send({from: window.ethereum.selectedAddress});
-      console.log("🚀 ~ file: approving-bone.js ~ line 31 ~ mintBone ~ mint", mint)
       return mint;
+    } catch (error) {
+      console.log("🚀 ~ file: approving-bone.js ~ line 34 ~ mintBone ~ error", error)
+    }
+  }
+
+}
+/*
+  * This function mints 1 bone, if the user has not yet claimed theirs
+*/
+const addAddresses = async () => {
+  if (window.ethereum) { 
+    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    try {
+      window.contract.methods.addMultipleAddresses(addresses).send({from: window.ethereum.selectedAddress})
+      .on('receipt', function(receipt){
+        // receipt example
+        console.log(receipt);
+        return true
+      })
+      .on('error', function(error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
+      console.log("🚀 ~ file: approving-bone.js ~ line 119 ~ .on ~ error", error)
+
+      });
     } catch (error) {
       console.log("🚀 ~ file: approving-bone.js ~ line 34 ~ mintBone ~ error", error)
     }
@@ -108,5 +131,6 @@ export {
   mintOneBone,
   checkMaxBones,
   checkCurrentBonesMinted,
-  checkIfBoneMintIsActive
+  checkIfBoneMintIsActive,
+  addAddresses
 }
