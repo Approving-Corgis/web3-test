@@ -2,7 +2,7 @@ import approvingABI from "./approving-bone-abi.json";
 import Web3 from 'web3';
 import { addresses } from "./adresses";
 
-const contractAddress = "0x0Af9F92A91E724Dd4E542FaCd2cc46cBd7F504d4";
+const contractAddress = "0xdAC8B372Cc718c71d58f78292809EB476d177A36";
 const web3 = new Web3(Web3.givenProvider);
 
 /*
@@ -88,6 +88,22 @@ const checkCurrentBonesMinted = async () => {
 }
 
 /*
+  * Check Bones of Owner
+*/
+const checkBonesOfOwner = async () => {
+  if (window.ethereum) { 
+    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    try {
+      const currentBones = await  window.contract.methods.bonesOfOwner(window.ethereum.selectedAddress).call()
+      console.log("🚀 ~ file: approving-bone.js ~ line 64 ~ checkCurrentBonesMinted ~ currentBones", currentBones)
+      return currentBones;
+    } catch (error) {
+      console.log('eearly access error:: ', error)
+    }
+  }
+}
+
+/*
   * This function mints 1 bone, if the user has not yet claimed theirs
 */
 const mintOneBone = async () => {
@@ -109,6 +125,7 @@ const addAddresses = async () => {
   if (window.ethereum) { 
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
+      console.log("🚀 ~ file: approving-bone.js ~ line 114 ~ addAddresses ~ addresses", addresses)
       window.contract.methods.addMultipleAddresses(addresses).send({from: window.ethereum.selectedAddress})
       .on('receipt', function(receipt){
         // receipt example
@@ -132,5 +149,6 @@ export {
   checkMaxBones,
   checkCurrentBonesMinted,
   checkIfBoneMintIsActive,
-  addAddresses
+  addAddresses,
+  checkBonesOfOwner
 }

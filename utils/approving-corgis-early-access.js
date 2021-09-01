@@ -1,7 +1,7 @@
 import approvingABI from "./approving-corgis-abi.json";
 import Web3 from 'web3';
 
-const contractAddress = "0x0f12ef8195E058C37FAE62E5c2E6429dE2C17Ad4";
+const contractAddress = "0x0BE557927e54d31459600f49C4b788EeC55e5Dac";
 const web3 = new Web3(Web3.givenProvider);
 
 
@@ -148,18 +148,34 @@ const checkMintPrice = async () => {
 }
 
 /*
+  * This function checks bone balance for Corgis
+  * 
+*/
+const checkBoneBal = async ({boneTokenId}) => {
+  if (window.ethereum) { 
+    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    try {
+      const maxPurchase = await window.contract.methods.checkBoneBalance(boneTokenId).call()
+      return maxPurchase;
+    } catch (error) {
+      console.log('eearly access error:: ', error)
+    }
+  }
+}
+
+/*
   * This function mints Corgis
   * Max 5 only
   * Must have 1 Bone
   * FOR EARLY ACCESS
 */
-const mintEarlyAccess = async ({amount, numberOfTokens}) => {
+const mintEarlyAccess = async ({amount, numberOfTokens, boneTokenId}) => {
   if (window.ethereum) { 
     window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
     try {
       const convertedAmount = web3.utils.toWei(amount.toString());
 
-      const mint = await  window.contract.methods.earlyAccessMint(numberOfTokens)
+      const mint = await  window.contract.methods.earlyAccessMint(boneTokenId, numberOfTokens)
         .send({
           from: window.ethereum.selectedAddress,
           value: convertedAmount // This should be the computed amount: 5 x 0.05 = 0.25
@@ -206,5 +222,6 @@ export {
   checkMaxEarlyAccessMint,
   checkMaxMint,
   checkMintPrice,
-  mintCorgis
+  mintCorgis,
+  checkBoneBal
 }

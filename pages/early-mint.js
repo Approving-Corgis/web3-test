@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { balanceOf } from '../utils/approving-bone';
-import { checkCurrentCorgisMinted, checkMaxEarlyAccess, mintEarlyAccess, checkIfEarlyAccessIsActive } from '../utils/approving-corgis-early-access';
+import { balanceOf, checkBonesOfOwner } from '../utils/approving-bone';
+import { checkCurrentCorgisMinted, checkMaxEarlyAccess, mintEarlyAccess, checkIfEarlyAccessIsActive, checkBoneBal } from '../utils/approving-corgis-early-access';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 
 
@@ -16,6 +16,9 @@ const Home = () => {
   const [isAllowedToMint, setIsAllowedToMint] = useState(false);
   const [currentEarly, setCurrentEarly] = useState(0);
   const [isEarlyMintActive, setIsEarlyMintActive] = useState(false);
+  const [boneIds, setBoneIds] = useState([]);
+  const [boneBalance, setBoneBalances] = useState(0);
+  const [currentBoneId, setCurrentBoneId] = useState(null);
 
   const handleChange = (event) => {
     setMintQt(event.target.value)
@@ -58,6 +61,7 @@ const Home = () => {
       checkHasEarlyAccess();
       checkAvailability();
       checkEarlyAccessIsActive();
+      checkBonesId();
     }
   }
 
@@ -91,6 +95,7 @@ const Home = () => {
 
   const mintCorgisEarly = async () => {
     const payload = {
+      boneTokenId: currentBoneId,
       amount: (mintQt  * 0.05), // number of corgis * price
       numberOfTokens: mintQt,
     }
@@ -103,6 +108,20 @@ const Home = () => {
     const hasMinetd = await checkCurrentCorgisMinted();
     setMaxEarly(maxCorgis);
     setCurrentEarly(hasMinetd);
+  }
+
+  const checkBonesId = async() => {
+    const bones = await checkBonesOfOwner();
+    console.log("🚀 ~ file: early-mint.js ~ line 110 ~ checkBonesId ~ bones", bones)
+    setBoneIds(bones);
+    checkBoneB(bones[0]);
+    setCurrentBoneId(bones[0]);
+  }
+
+  const checkBoneB = async(id) => {
+    const boneBal = await checkBoneBal({boneTokenId: id});
+    console.log("🚀 ~ file: early-mint.js ~ line 122 ~ checkBoneBal ~ boneBal", boneBal)
+    setBoneBalances(5 - boneBal);
   }
 
   return (
@@ -129,6 +148,8 @@ const Home = () => {
           isAllowedToMint ? 
           <div>
             <h2>Early Access Mint</h2>
+            <p>bone IDs: {boneIds}</p>
+            <p>bone balance: {boneBalance}</p>
             Quantity <input type="number" value={mintQt}  onChange={handleChange} />
             <button onClick={() => mintCorgisEarly()}>Mint Early Access</button>
             <p>Count: {currentEarly}/{maxEarly}</p>
