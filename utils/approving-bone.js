@@ -1,8 +1,9 @@
-import approvingABI from "./approving-bone-abi.json";
 import Web3 from 'web3';
 import { addresses } from "./adresses";
+import config from "./env";
 
-const contractAddress = "0xdAC8B372Cc718c71d58f78292809EB476d177A36";
+const contractAddress = config.boneContract;
+const ABI = config.boneABI;
 const web3 = new Web3(Web3.givenProvider);
 
 /*
@@ -11,7 +12,7 @@ const web3 = new Web3(Web3.givenProvider);
 */
 const hasEarlyAccess = async () => {
   if (window.ethereum) { 
-    window.contract = new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = new web3.eth.Contract(ABI, contractAddress);
     try {
       const hasAccess = window.contract.methods.earlyAccessAddresses(window.ethereum.selectedAddress).call();
       return hasAccess;
@@ -28,7 +29,7 @@ const hasEarlyAccess = async () => {
 */
 const balanceOf = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const balance = await  window.contract.methods.balanceOf(window.ethereum.selectedAddress).call()
       console.log("🚀 ~ file: approving-bone.js ~ line 33 ~ balanceOf ~ balance", balance)
@@ -45,7 +46,7 @@ const balanceOf = async () => {
 */
 const checkMaxBones = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const maxBones = await  window.contract.methods.maxBones().call()
       console.log("🚀 ~ file: approving-bone.js ~ line 48 ~ checkMaxBones ~ maxBones", maxBones)
@@ -61,7 +62,7 @@ const checkMaxBones = async () => {
 */
 const checkIfBoneMintIsActive = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const isActive = await  window.contract.methods.boneMintActive().call()
       return isActive;
@@ -76,7 +77,7 @@ const checkIfBoneMintIsActive = async () => {
 */
 const checkCurrentBonesMinted = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const currentBones = await  window.contract.methods.totalSupply().call()
       console.log("🚀 ~ file: approving-bone.js ~ line 64 ~ checkCurrentBonesMinted ~ currentBones", currentBones)
@@ -92,7 +93,7 @@ const checkCurrentBonesMinted = async () => {
 */
 const checkBonesOfOwner = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const currentBones = await  window.contract.methods.bonesOfOwner(window.ethereum.selectedAddress).call()
       console.log("🚀 ~ file: approving-bone.js ~ line 64 ~ checkCurrentBonesMinted ~ currentBones", currentBones)
@@ -108,7 +109,7 @@ const checkBonesOfOwner = async () => {
 */
 const mintOneBone = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const mint = await  window.contract.methods.mintBone().send({from: window.ethereum.selectedAddress});
       return mint;
@@ -123,7 +124,7 @@ const mintOneBone = async () => {
 */
 const addAddresses = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       console.log("🚀 ~ file: approving-bone.js ~ line 114 ~ addAddresses ~ addresses", addresses)
       window.contract.methods.addMultipleAddresses(addresses).send({from: window.ethereum.selectedAddress})

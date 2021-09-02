@@ -1,7 +1,9 @@
-import approvingABI from "./approving-corgis-abi.json";
 import Web3 from 'web3';
+import config from "./env";
 
-const contractAddress = "0x0BE557927e54d31459600f49C4b788EeC55e5Dac";
+const contractAddress = config.corgiContract;
+const ABI = config.corgiABI;
+
 const web3 = new Web3(Web3.givenProvider);
 
 
@@ -10,7 +12,7 @@ const web3 = new Web3(Web3.givenProvider);
 */
 const checkIfEarlyAccessIsActive = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const isActive = await  window.contract.methods.earlyAccessIsActive().call()
       return isActive;
@@ -25,7 +27,7 @@ const checkIfEarlyAccessIsActive = async () => {
 */
 const checkIfMintIsActive = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const isActive = await  window.contract.methods.corgiSaleIsActive().call()
       return isActive;
@@ -41,7 +43,7 @@ const checkIfMintIsActive = async () => {
 */
 const balanceOf = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const balance = await  window.contract.methods.balanceOf(window.ethereum.selectedAddress).call()
       return balance;
@@ -57,7 +59,7 @@ const balanceOf = async () => {
 */
 const checkMaxEarlyAccess = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const maxEarlyAccess = await  window.contract.methods.maxEarlyAccess().call()
       return maxEarlyAccess;
@@ -73,7 +75,7 @@ const checkMaxEarlyAccess = async () => {
 */
 const checkMaxCorgisAvailable = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const maxEarlyAccess = await  window.contract.methods.maxCorgis().call()
       return maxEarlyAccess;
@@ -89,7 +91,7 @@ const checkMaxCorgisAvailable = async () => {
 */
 const checkCurrentCorgisMinted = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const currentBones = await  window.contract.methods.totalSupply().call()
       return currentBones;
@@ -105,7 +107,7 @@ const checkCurrentCorgisMinted = async () => {
 */
 const checkMaxEarlyAccessMint = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const maxPurchase = await  window.contract.methods.maxEarlyAccessPurhase().call()
       return maxPurchase;
@@ -121,7 +123,7 @@ const checkMaxEarlyAccessMint = async () => {
 */
 const checkMaxMint = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const maxPurchase = await  window.contract.methods.maxPurchase().call()
       return maxPurchase;
@@ -137,7 +139,7 @@ const checkMaxMint = async () => {
 */
 const checkMintPrice = async () => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const maxPurchase = await window.contract.methods.price().call()
       return maxPurchase;
@@ -153,7 +155,7 @@ const checkMintPrice = async () => {
 */
 const checkBoneBal = async ({boneTokenId}) => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const maxPurchase = await window.contract.methods.checkBoneBalance(boneTokenId).call()
       return maxPurchase;
@@ -171,7 +173,7 @@ const checkBoneBal = async ({boneTokenId}) => {
 */
 const mintEarlyAccess = async ({amount, numberOfTokens, boneTokenId}) => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const convertedAmount = web3.utils.toWei(amount.toString());
 
@@ -195,7 +197,7 @@ const mintEarlyAccess = async ({amount, numberOfTokens, boneTokenId}) => {
 */
 const mintCorgis = async ({amount, numberOfTokens}) => {
   if (window.ethereum) { 
-    window.contract = await new web3.eth.Contract(approvingABI, contractAddress);
+    window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       const convertedAmount = web3.utils.toWei(amount.toString());
       const mint = await  window.contract.methods.mintCorgis(numberOfTokens)
