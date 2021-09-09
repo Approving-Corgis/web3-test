@@ -1,15 +1,17 @@
-const env = 'development';
+const env = 'production';
 import { addressesMainnet } from "./adresses";
 import { addressesTestnet } from "./adresses-test";
 import boneDevABI from "./approving-bone-abi.dev.json";
 import corgiDevABI from "./approving-corgis-abi.dev.json";
 
+import boneProdABI from "./approving-bone-abi.prod.json";
+import corgiProdABI from "./approving-corgis-abi.prod.json";
 const config = {
   production: {
-    boneContract: '',
-    boneABI: '',
-    corgiContract: '',
-    corgiABI: '',
+    boneContract: '0x77C7f7Dc1b592E884966f0dc4AE0fFB93CBA1a7e',
+    boneABI: boneProdABI,
+    corgiContract: '0x4F1B1306E8bd70389d3C413888a61BB41171a0Bc',
+    corgiABI: corgiProdABI,
     addresses: addressesMainnet
   },
   development: {

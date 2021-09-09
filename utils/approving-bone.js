@@ -1,9 +1,9 @@
 import Web3 from 'web3';
-import { addresses } from "./adresses";
 import config from "./env";
 
 const contractAddress = config.boneContract;
 const ABI = config.boneABI;
+const addresses = config.addresses;
 const web3 = new Web3(Web3.givenProvider);
 
 /*
