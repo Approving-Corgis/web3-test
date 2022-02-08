@@ -1,5 +1,5 @@
 const constants = {
-  DEFAULT_CHAIN: '0x1'
+  DEFAULT_CHAIN: '0x4'
 }
 
 export default constants;

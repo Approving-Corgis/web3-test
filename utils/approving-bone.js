@@ -1,5 +1,7 @@
 import Web3 from 'web3';
 import config from "./env";
+import { MerkleTree } from "merkletreejs";
+import keccak256 from "keccak256";
 
 const contractAddress = config.boneContract;
 const ABI = config.boneABI;
@@ -143,6 +145,21 @@ const addAddresses = async () => {
   }
 }
 
+/*
+  * This function mints 1 bone, if the user has not yet claimed theirs
+*/
+const hashIt = async () => {
+  try {
+    console.log("🚀 ~ file: approving-bone.js ~ line 114 ~ addAddresses ~ addresses", addresses)
+    const leafNodes = addresses.map(addr => keccak256(addr));
+    const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true});
+    console.log("🚀 ~ file: approving-bone.js ~ line 156 ~ hashIt ~ merkleTree", merkleTree.getRoot())
+    console.log("🚀 ~ file: approving-bone.js ~ line 156 ~ hashIt ~ merkleTree", merkleTree.toString())
+  } catch (error) {
+    console.log("🚀 ~ file: approving-bone.js ~ line 34 ~ mintBone ~ error", error)
+  }
+}
+
 export { 
   hasEarlyAccess, 
   balanceOf,
@@ -151,5 +168,6 @@ export {
   checkCurrentBonesMinted,
   checkIfBoneMintIsActive,
   addAddresses,
-  checkBonesOfOwner
+  checkBonesOfOwner,
+  hashIt
 }

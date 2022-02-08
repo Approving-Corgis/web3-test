@@ -5,8 +5,10 @@ import {
   mintOneBone, 
   checkMaxBones,
   checkCurrentBonesMinted, 
-  addAddresses} from '../utils/approving-bone';
+  addAddresses,
+  hashIt} from '../utils/approving-bone';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
+import { balanceOf as tbBalanceOf, createFreeBoneMerkle, mintFreesale, mintFreeWithBone } from '../utils/tasty-bones';
 
 
 const Home = () => { 
@@ -90,10 +92,11 @@ const Home = () => {
     }
   }
 
-  const mintBoneNow = async () => {
-    const mint = await mintOneBone();
+  const createFreeBoneMerkleTree = async () => {
+    const mint = await createFreeBoneMerkle();
     console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
+
 
   const addMultiple = async () => {
     const mint = await addAddresses();
@@ -104,6 +107,21 @@ const Home = () => {
     const availableBones = await checkCurrentBonesMinted();
     setMaxBones(bones);
     setCurrentBones(availableBones);
+  }
+
+  const hashThatShit = async() => {
+    const theHash = await hashIt();
+  }
+
+
+  const mintFreeWithBoneNow = async () => {
+    const mint = await mintFreeWithBone();
+    console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
+  }
+
+  const mintFreeWithoutBone = async () => {
+    const mint = await mintFreesale({numOfTokens: 1});
+    console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
   }
 
   return (
@@ -138,7 +156,7 @@ const Home = () => {
               isAllowedToMint ? 
                 <div>
                   <p>You are allowed to Mint</p>
-                  <button onClick={() => mintBoneNow()}>Mint Bone</button>
+                  <button onClick={() => createFreeBoneMerkleTree()}>Create Merkle</button>
                   <p>Current: {currentBones} / {maxBones}</p>
                 </div>
                 :
@@ -149,10 +167,28 @@ const Home = () => {
       </div>
       <div>
       {connected && 
-        <div>
-          <p>Add multiple addresses</p>
-          <button onClick={() => addMultiple()}>Add</button>
-        </div>
+        <>
+          <div>
+            <p>Add multiple addresses</p>
+            <button onClick={() => addMultiple()}>Add</button>
+          </div>
+          <div>
+            <p>Hash that shit</p>
+            <button onClick={() => hashThatShit()}>Hash It</button>
+          </div>
+          <div>
+            <p>Create Hash</p>
+            <button onClick={() => createFreeBoneMerkleTree()}>Create Hash</button>
+          </div>
+          <div>
+            <p>Mint Free with bone</p>
+            <button onClick={() => mintFreeWithBoneNow()}>Mint Free With Bone</button>
+          </div>
+          <div>
+            <p>Mint Free without bone</p>
+            <button onClick={() => mintFreeWithoutBone()}>Mint Free Without Bone</button>
+          </div>
+        </>
         }
       </div>
     </div>
