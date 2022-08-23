@@ -9,6 +9,7 @@ import {
   hashIt} from '../utils/approving-bone';
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
 import { balanceOf as tbBalanceOf, createFreeBoneMerkle, mintFreesale, mintFreeWithBone } from '../utils/tasty-bones';
+import { checkTotalSupply, togglePublic, withdraw } from '../utils/wen-wl';
 
 
 const Home = () => { 
@@ -20,6 +21,8 @@ const Home = () => {
   const [alreadyOwnedBone, setAlreadyOwnedBone] = useState(false);
   const [maxBones, setMaxBones] = useState(0);
   const [currentBones, setCurrentBones] = useState(0);
+  const [totalSupply, setTotalSupply] = useState(0);
+  const [roots, setRoots] = useState(null);
 
   const handleChange = (event) => {
     setMintQt(event.target.value)
@@ -93,8 +96,12 @@ const Home = () => {
   }
 
   const createFreeBoneMerkleTree = async () => {
-    const mint = await createFreeBoneMerkle();
-    console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
+    try {
+      const mint = await createFreeBoneMerkle();
+      setRoots(mint)
+    } catch (error) {
+      
+    }
   }
 
 
@@ -121,7 +128,13 @@ const Home = () => {
 
   const mintFreeWithoutBone = async () => {
     const mint = await mintFreesale({numOfTokens: 1});
-    console.log("🚀 ~ file: index.js ~ line 85 ~ mintBone ~ mint", mint)
+  }
+  
+  const withdrawWenWL = async () => {
+    setInterval(async() => {
+      let _totalSupply = await checkTotalSupply();
+      setTotalSupply(_totalSupply);
+    }, 10000);
   }
 
   return (
@@ -169,24 +182,22 @@ const Home = () => {
       {connected && 
         <>
           <div>
-            <p>Add multiple addresses</p>
-            <button onClick={() => addMultiple()}>Add</button>
-          </div>
-          <div>
-            <p>Hash that shit</p>
-            <button onClick={() => hashThatShit()}>Hash It</button>
-          </div>
-          <div>
             <p>Create Hash</p>
             <button onClick={() => createFreeBoneMerkleTree()}>Create Hash</button>
           </div>
           <div>
-            <p>Mint Free with bone</p>
-            <button onClick={() => mintFreeWithBoneNow()}>Mint Free With Bone</button>
+            <p>Withdraw Wen WL</p>
+            <button onClick={() => withdrawWenWL()}>Check Tote Supply</button>
           </div>
           <div>
-            <p>Mint Free without bone</p>
-            <button onClick={() => mintFreeWithoutBone()}>Mint Free Without Bone</button>
+            {
+              roots !== null &&
+              <>
+                <p>Whitelist Root: {roots.wl}</p>
+                <p>Waitlist Root: {roots.wait}</p>
+                {/* <p>Raffle Root: {roots.raffleRoot}</p> */}
+              </>
+            }
           </div>
         </>
         }

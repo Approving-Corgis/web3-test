@@ -1,13 +1,15 @@
 import Web3 from 'web3';
 import config from "./env";
 import { MerkleTree } from "merkletreejs";
-import keccak256 from "keccak256";
+import { getAddress, solidityKeccak256, keccak256 } from 'ethers/lib/utils';
+
 
 const contractAddress = config.tastyBonesContract;
 const ABI = config.tbABI;
 const addresses = config.addresses;
-const addressesBoneFree = config.addressesBone;
 const addressesFreeMint = config.addressesFreeMint;
+const addressesPresale = config.addressesPresale;
+const addressesRaffle = config.addressesRaffle;
 const web3 = new Web3(Web3.givenProvider);
 
 /*
@@ -51,23 +53,58 @@ const createFreeBoneMerkle = async () => {
   if (window.ethereum) { 
     window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
-      const boneLeafNodes = addressesBoneFree.map(addr => keccak256(addr));
-      const freeBoneMerkleTree = new MerkleTree(boneLeafNodes, keccak256, { sortPairs: true});
-      const claimingAddress = keccak256(window.ethereum.selectedAddress);
-      console.log("🚀 ~ file: tasty-bones.js ~ BONE MERKLE ROOT", freeBoneMerkleTree.getHexRoot())
+      const boneLeafNodes = addressesPresale.map(addr => solidityKeccak256(["address"],[web3.utils.toChecksumAddress(addr)]));
+      const freeBoneMerkleTree = new MerkleTree(
+        boneLeafNodes,
+        (digest) => Buffer.from(keccak256("0x" + digest.toString("hex")).substring(2), "hex"),
+        { sortPairs: true });
+      const claimingAddress = solidityKeccak256(["address"],[web3.utils.toChecksumAddress(window.ethereum.selectedAddress)]);
+      console.log("🚀 ~ file: tasty-bones.js ~ FREE MERKLE ROOT", freeBoneMerkleTree.getHexRoot())
       const testverify = freeBoneMerkleTree.verify(freeBoneMerkleTree.getHexProof(claimingAddress), claimingAddress, freeBoneMerkleTree.getHexRoot());
-      console.log("🚀 ~ freeBoneMerkleTree ~ testverify", testverify)
+      console.log("🚀 ~ freeBoneMerkleTree ~ testverify bone", testverify)
 
-      const leafNodes = addressesFreeMint.map(addr => keccak256(addr.address));
-      console.log("🚀 ~ file: tasty-bones.js ~ line 62 ~ createFreeBoneMerkle ~ leafNodes", leafNodes)
-      const freeMintMerkleTree = new MerkleTree(leafNodes, keccak256, {sortPairs: true});
-      const claimingAddress2 = keccak256(window.ethereum.selectedAddress);
-      console.log("🚀 ~ file: tasty-bones.js ~ FREE MINT MERKLE ROOT", freeMintMerkleTree.getHexRoot())
-      const testverify2 = freeMintMerkleTree.verify(freeMintMerkleTree.getHexProof(claimingAddress2), claimingAddress2, freeMintMerkleTree.getHexRoot());
-      console.log("🚀 ~ freeMintMerkleTree ~ testverify", testverify2)
+      const waitNodes = addressesRaffle.map(addr => solidityKeccak256(["address"],[web3.utils.toChecksumAddress(addr)]));
+      const waitMerkleTree = new MerkleTree(
+        waitNodes,
+        (digest) => Buffer.from(keccak256("0x" + digest.toString("hex")).substring(2), "hex"),
+        { sortPairs: true });
+      const claimingAddress3 = solidityKeccak256(["address"],[web3.utils.toChecksumAddress(window.ethereum.selectedAddress)]);
+      console.log("🚀 ~ file: tasty-bones.js ~ FREE MERKLE ROOT", waitMerkleTree.getHexRoot())
+      const testverify2 = waitMerkleTree.verify(waitMerkleTree.getHexProof(claimingAddress3), claimingAddress3, waitMerkleTree.getHexRoot());
+      console.log("🚀 ~ freeBoneMerkleTree ~ testverify bone", testverify)
+
+      // const leafNodes = addressesPresale.map(addr => solidityKeccak256(["address","uint256"], [web3.utils.toChecksumAddress(addr.address), addr.maxMint]));
+      // console.log("🚀 ~ file: tasty-bones.js ~ line 67 ~ createFreeBoneMerkle ~ leafNodes", leafNodes)
+      // const freeMintMerkleTree = new MerkleTree(leafNodes, (digest) => Buffer.from(keccak256("0x" + digest.toString("hex")).substring(2), "hex"), {sortPairs: true});
+      // const maxMint = addressesPresale.find(addr => web3.utils.toChecksumAddress(addr.address) === web3.utils.toChecksumAddress(window.ethereum.selectedAddress)).maxMint
+      // const claimingAddress2 = solidityKeccak256(["address","uint256"], [web3.utils.toChecksumAddress(window.ethereum.selectedAddress), maxMint]);
+      // console.log("🚀 ~ file: tasty-bones.js ~ ALLOW LIST MERKLE ROOT", freeMintMerkleTree.getHexRoot())
+      // const testverify2 = freeMintMerkleTree.verify(freeMintMerkleTree.getHexProof(claimingAddress2), claimingAddress2, freeMintMerkleTree.getHexRoot());
+      // console.log("🚀 ~ freeMintMerkleTree ~ testverify free", testverify2)
+
+      // const presaleLeafNodes = addressesRaffle.map(addr => solidityKeccak256(["address","uint256"], [web3.utils.toChecksumAddress(addr.address), addr.maxMint]));
+      // const presaleMintMerkleTree = new MerkleTree(presaleLeafNodes, (digest) => Buffer.from(keccak256("0x" + digest.toString("hex")).substring(2), "hex"), {sortPairs: true});
+      // const maxMint2 = addressesRaffle.find(addr => web3.utils.toChecksumAddress(addr.address) === web3.utils.toChecksumAddress(window.ethereum.selectedAddress)).maxMint
+      // const claimingAddress3 = solidityKeccak256(["address","uint256"], [web3.utils.toChecksumAddress(window.ethereum.selectedAddress), maxMint2]);
+      // console.log("🚀 ~ file: tasty-bones.js ~ RAFFLE MERKLE ROOT", presaleMintMerkleTree.getHexRoot())
+      // const testverify3 = presaleMintMerkleTree.verify(presaleMintMerkleTree.getHexProof(claimingAddress3), claimingAddress3, presaleMintMerkleTree.getHexRoot());
+      // console.log("🚀 ~ freeMintMerkleTree ~ testverify presale", testverify3)
+
+      return {
+        wl: freeBoneMerkleTree.getHexRoot(), 
+        wait: waitMerkleTree.getHexRoot(), 
+        // raffleRoot: presaleMintMerkleTree.getHexRoot()
+      }
+
+      // const raffleLeafNodes = addressesRaffle.map(addr => solidityKeccak256(["address"],[web3.utils.toChecksumAddress(addr)]));
+      // const raffleMintMerkleTree = new MerkleTree(raffleLeafNodes, (digest) => Buffer.from(keccak256("0x" + digest.toString("hex")).substring(2), "hex"), {sortPairs: true});
+      // const claimingAddress4 = solidityKeccak256(["address"],[web3.utils.toChecksumAddress(window.ethereum.selectedAddress)]);
+      // console.log("🚀 ~ file: tasty-bones.js ~ RAFFLE MERKLE ROOT", raffleMintMerkleTree.getHexRoot())
+      // const testverify4 = raffleMintMerkleTree.verify(raffleMintMerkleTree.getHexProof(claimingAddress4), claimingAddress4, raffleMintMerkleTree.getHexRoot());
+      // console.log("🚀 ~ freeMintMerkleTree ~ testverify raffle", testverify4)
       // return mint;
     } catch (error) {
-      console.log("🚀 ~ file: approving-bone.js ~ line 34 ~ mintBone ~ error", error)
+      console.log("🚀 CREATE HASH ERROR", error)
     }
   }
 
@@ -82,9 +119,16 @@ const mintFreeWithBone = async () => {
     window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       // FOR BONE
-      const boneLeafNodes = addressesBoneFree.map(addr => keccak256(addr));
-      const freeBoneMerkleTree = new MerkleTree(boneLeafNodes, keccak256, {sortPairs: true});
-      const claimingAddress = keccak256(window.ethereum.selectedAddress);
+      const boneLeafNodes = addressesBoneFree.map(addr => solidityKeccak256(["address"],[web3.utils.toChecksumAddress(addr)]));
+      const freeBoneMerkleTree = new MerkleTree(
+        boneLeafNodes,
+        // (digest: Buffer) => Buffer.from(keccak256("0x" + digest.toString("hex")).substring(2), "hex"),
+        keccak256,
+        { sortPairs: true });
+      const claimingAddress = solidityKeccak256(["address"],[web3.utils.toChecksumAddress(window.ethereum.selectedAddress)]);
+      console.log("🚀 ~ file: tasty-bones.js ~ BONE MERKLE ROOT", freeBoneMerkleTree.getHexRoot())
+      const testverify = freeBoneMerkleTree.verify(freeBoneMerkleTree.getHexProof(claimingAddress), claimingAddress, freeBoneMerkleTree.getHexRoot());
+      console.log("🚀 ~ freeBoneMerkleTree ~ testverify", testverify)
 
       const mint = await window.contract.methods.mintFreeWithBone(
         2, // bone token ID 
@@ -113,9 +157,9 @@ const mintFreesale = async ({numOfTokens}) => {
     window.contract = await new web3.eth.Contract(ABI, contractAddress);
     try {
       // FOR WL
-      const leafNodes = addressesFreeMint.map(addr => keccak256(addr.address));
-      const freeMintMerkleTree = new MerkleTree(leafNodes, keccak256, {sortPairs: true});
-      const claimingAddress2 = keccak256(window.ethereum.selectedAddress);
+      const leafNodes = addressesFreeMint.map(addr => solidityKeccak256(["address","uint256"], [addr.address, addr.maxMint]));
+      const freeMintMerkleTree = new MerkleTree(leafNodes, (digest) => Buffer.from(keccak256("0x" + digest.toString("hex")).substring(2), "hex"), {sortPairs: true});
+      const claimingAddress2 = solidityKeccak256(["address","uint256"], [window.ethereum.selectedAddress, 1]);
       const testverify2 = freeMintMerkleTree.verify(freeMintMerkleTree.getHexProof(claimingAddress2), claimingAddress2, freeMintMerkleTree.getHexRoot());
       console.log("🚀 ~ file: tasty-bones.js ~ line 96 ~ mintFreesale ~ testverify2", testverify2)
       
