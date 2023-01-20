@@ -7,7 +7,10 @@ module.exports = {
       path: false,
       http: false,
       https: false,
-      stream: false };
+      stream: false,
+      "crypto": false,
+      "os": false
+     };
     return config;
   },
 }

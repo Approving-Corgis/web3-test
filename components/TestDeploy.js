@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic'
 import { checkChain, getCurrentWalletConnected } from '../utils/connection';
-import { deployContract, generateUsingSource } from '../utils/contract-deploy';
+import { generateUsingSource } from '../utils/contract-deploy';
 //useSWR allows the use of SWR inside function components
 import useSWR from 'swr';
 
 //Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
-const Deploy = () => { 
+const TestDeploy = () => { 
   const { data, error } = useSWR('/api/staticdata', fetcher);
   console.log("🚀 ~ file: deploy.js:13 ~ Deploy ~ data", data)
   console.log("🚀 ~ file: deploy.js:12 ~ Deploy ~ error", error)
@@ -93,4 +92,4 @@ const Deploy = () => {
   )
 }
   
-export default Deploy;
+export default TestDeploy;
