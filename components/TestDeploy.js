@@ -9,8 +9,6 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const TestDeploy = () => { 
   const { data, error } = useSWR('/api/staticdata', fetcher);
-  console.log("🚀 ~ file: deploy.js:13 ~ Deploy ~ data", data)
-  console.log("🚀 ~ file: deploy.js:12 ~ Deploy ~ error", error)
   const [hasMetamask, setHasMetamask] = useState(false);
   const [connected, setConnected] = useState(false);
   const [addresses, setAddresses] = useState('');

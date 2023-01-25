@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
 // OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
 
@@ -1864,7 +1862,7 @@ abstract contract DefaultOperatorFilterer is OperatorFilterer {
     constructor() OperatorFilterer(DEFAULT_SUBSCRIPTION, true) {}
 }
 
-contract rekt is ERC721A, DefaultOperatorFilterer, Ownable, ReentrancyGuard {
+contract bmat is ERC721A, DefaultOperatorFilterer, Ownable, ReentrancyGuard {
     uint256 public MAX_SUPPLY = 5;
 
     
@@ -1894,7 +1892,7 @@ contract rekt is ERC721A, DefaultOperatorFilterer, Ownable, ReentrancyGuard {
 
     address public constant RL_ADDRESS = 0xc9b5553910bA47719e0202fF9F617B8BE06b3A09; 
 
-    constructor() ERC721A("rekt", "REKT") {
+    constructor() ERC721A("bmat", "BMAT") {
         
         
   _safeMint(0x52A67531a510261e8f12EF30Fe42f0B3334545D6, 1);

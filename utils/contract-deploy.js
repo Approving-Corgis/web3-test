@@ -17,15 +17,13 @@ const deployContract = async(abi, bytecode) => {
       console.log("🚀 ~ file: contract-deploy.js ~ line 16 ~ deployContract ~ contract", contract.address)
     } catch (error) {
       console.log("🚀 ~ file: contract-deploy.js:18 ~ deployContract ~ error", error)
-      
     }
   }
-  
 }
 
 export const generateUsingSource = async (source) => {
   if(typeof window !== undefined && typeof window.ethereum !== undefined) {
-    const compiledData = await compile(source, 'rekt');
+    const compiledData = await compile(source, 'Test');
     await deployContract(compiledData.abi, compiledData.bytecode);
   }
 };
